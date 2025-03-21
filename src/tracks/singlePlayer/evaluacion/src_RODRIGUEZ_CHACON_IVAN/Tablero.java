@@ -67,6 +67,32 @@ public class Tablero {
     ArrayList<ACTIONS> getAvailableActions(Nodo nodo){
         return getAvailableActions(nodo.pos, nodo.capa_azul, nodo.capa_roja);
     }
+    public int hayCapa(Pair pos){
+        if(pos.equals(this.capa_azul))
+            return 1;
+        if(pos.equals(this.capa_roja))
+            return -1;
+        if(pos.x<0 || pos.x>=grid[0].length || pos.y<0 || pos.y>=grid.length)
+            return 0;
+        int salida = 0;
+        if(this.grid[pos.y][pos.x].isEmpty())
+            return 0;
+        int itype = this.grid[pos.y][pos.x].get(0).itype;
+        if(itype == 8)
+            salida = -1;
+        else if(itype == 9)
+            salida = 1;
+        return salida;
+    }
+    public boolean esSalida(Pair pos){
+        if(pos.equals(this.salida))
+            return true;
+        if(pos.x<0 || pos.x>=grid[0].length || pos.y<0 || pos.y>=grid.length)
+            return false;
+        if(this.grid[pos.y][pos.x].isEmpty())
+            return false;
+        return this.grid[pos.y][pos.x].get(0).itype == 4;
+    }
 }
 
 

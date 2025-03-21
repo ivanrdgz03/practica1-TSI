@@ -28,24 +28,24 @@ public class AgenteDijkstra extends AbstractPlayer {
         Nodo actual = new Nodo(inicial, 0);
         pendientes.add(actual);
         while (!pendientes.isEmpty()) {
-            actual = pendientes.iterator().next();
-            pendientes.remove(actual);
+            actual = pendientes.poll();
             if(visitados.contains(actual))
                 continue;
 
             visitados.add(actual);
             
-            if (actual.pos.equals(tablero.capa_roja)) {
+            int capa = tablero.hayCapa(actual.pos);
+            if (capa < 0) {
                 actual.capa_roja = true;
                 actual.capa_azul = false;
             }
-            if (actual.pos.equals(tablero.capa_azul)) {
+            if (capa > 0) {
                 actual.capa_azul = true;
                 actual.capa_roja = false;
             }
-            if (actual.pos.equals(tablero.salida)) {
+            if (actual.pos.equals(tablero.salida))
                 break;
-            }
+
             for (Nodo nodo : actual.getHijos(tablero.getAvailableActions(actual)))
                 if(!visitados.contains(nodo))
                     pendientes.add(nodo);
