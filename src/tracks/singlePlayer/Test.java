@@ -21,6 +21,7 @@ public class Test {
 		String sampleFlatMCTSController = "tracks.singlePlayer.simple.greedyTreeSearch.Agent";
 		String camelController = "tracks.singlePlayer.evaluacion.src_RODRIGUEZ_CHACON_IVAN.myAgent_Camel";
 		String dijkstraController = "tracks.singlePlayer.evaluacion.src_RODRIGUEZ_CHACON_IVAN.AgenteDijkstra";
+		String aStarController = "tracks.singlePlayer.evaluacion.src_RODRIGUEZ_CHACON_IVAN.AgenteAStar";
 
 		String sampleMCTSController = "tracks.singlePlayer.advanced.sampleMCTS.Agent";
         String sampleRSController = "tracks.singlePlayer.advanced.sampleRS.Agent";
@@ -51,7 +52,7 @@ public class Test {
 		//ArcadeMachine.playOneGame(game, level1, recordActionsFile, seed);
 
 		// 2. This plays a game in a level by the controller.
-		ArcadeMachine.runOneGame(game, level1, visuals, dijkstraController/*sampleRHEAController*/, recordActionsFile, seed, 0);
+		ArcadeMachine.runOneGame(game, level1, visuals, aStarController/*sampleRHEAController*/, recordActionsFile, seed, 0);
 
 
 		// 3. This replays a game from an action file previously recorded

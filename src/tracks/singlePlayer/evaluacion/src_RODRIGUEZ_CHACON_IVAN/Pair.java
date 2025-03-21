@@ -20,7 +20,7 @@ public class Pair implements Comparable<Pair> {
     public int compareTo(Pair p) {
         int compare = Integer.compare(this.x, p.x);
         if (compare == 0)
-            return Integer.compare(this.y, p.y);
+           compare = Integer.compare(this.y, p.y);
         return compare;
     }
 

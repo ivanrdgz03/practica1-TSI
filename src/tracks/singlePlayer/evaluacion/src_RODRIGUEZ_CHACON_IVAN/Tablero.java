@@ -23,26 +23,28 @@ public class Tablero {
         this.salida = null;
         this.capa_roja = null;
         this.capa_azul = null;
-        for(int i = 0; i < this.grid.length && (this.pos_inicial == null || this.salida == null || this.capa_roja == null || this.capa_azul == null); i++){
-            for(int j = 0; j < this.grid[0].length && (this.pos_inicial == null || this.salida == null || this.capa_roja == null || this.capa_azul == null); j++){
-                if(this.grid[i][j].size() > 0){
-                    if(this.grid[i][j].get(0).itype == 4)
-                        this.salida = new Pair(j,i);
-                    if(this.grid[i][j].get(0).itype == 10)
-                        this.pos_inicial = new Pair(j,i);
-                    if(this.grid[i][j].get(0).itype == 8)
-                        this.capa_roja = new Pair(j,i);
-                    if(this.grid[i][j].get(0).itype == 9)
-                        this.capa_azul = new Pair(j,i);
+        boolean encontrados = false;
+        for (int i = 0; i < this.grid.length && !encontrados; i++)
+            for (int j = 0; j < this.grid[0].length; j++)
+                if (!this.grid[i][j].isEmpty()){
+                    int tipo = this.grid[i][j].get(0).itype;
+                    switch (tipo) {
+                        case 4: this.salida = new Pair(j, i); break;
+                        case 10: this.pos_inicial = new Pair(j, i); break;
+                        case 8: this.capa_roja = new Pair(j, i); break;
+                        case 9: this.capa_azul = new Pair(j, i); break;
+                    }
+        
+                    if (this.pos_inicial != null && this.salida != null && this.capa_roja != null && this.capa_azul != null) {
+                        encontrados = true;
+                        break;
+                    }
                 }
-            }
-        }
     }
     boolean isTransitable(Pair pos, boolean capa_azul, boolean capa_roja){
-        if(pos.x < 0 || pos.x >= grid[0].length || pos.y < 0 || pos.y >= grid.length){
-            System.err.println("Posicion fuera de los limites del tablero");
+        if(pos.x < 0 || pos.x >= grid[0].length || pos.y < 0 || pos.y >= grid.length)
             return false;
-        }
+
         if(grid[pos.y][pos.x].isEmpty())
             return true;
         int itype = grid[pos.y][pos.x].get(0).itype;

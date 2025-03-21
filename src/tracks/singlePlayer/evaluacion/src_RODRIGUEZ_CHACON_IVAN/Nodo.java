@@ -2,6 +2,8 @@ package tracks.singlePlayer.evaluacion.src_RODRIGUEZ_CHACON_IVAN;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
+import java.util.Objects;
 
 import core.game.Observation;
 import core.game.StateObservation;
@@ -12,8 +14,10 @@ import tools.ElapsedCpuTimer;
 import tools.Vector2d;
 
 public class Nodo implements Comparable<Nodo> {
+    public static boolean HEURISTICA_ENABLED = true;
     public Pair pos;
     public int coste;
+    public int heuristica;
     public boolean capa_roja, capa_azul;
     public Nodo padre;
     public ACTIONS accion_padre;
@@ -23,50 +27,63 @@ public class Nodo implements Comparable<Nodo> {
         this.coste = coste;
         this.padre = padre;
         this.accion_padre = accion_padre;
+        this.heuristica = 0;
         this.capa_azul = padre.capa_azul;
         this.capa_roja = padre.capa_roja;
     }
 
     public Nodo(Pair pos, int coste) {
         this.pos = pos;
+        this.heuristica = 0;
         this.coste = coste;
         this.padre = null;
         this.capa_roja = false;
         this.capa_azul = false;
     }
-
-    public boolean equals(Nodo n) {
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Nodo)) return false;
+        Nodo n = (Nodo) o;
         return (this.pos.x == n.pos.x && this.pos.y == n.pos.y && this.capa_azul == n.capa_azul && this.capa_roja == n.capa_roja);
     }
 
     @Override
     public int compareTo(Nodo n) {
-        int compare = Integer.compare(this.coste, n.coste);
-        if (compare == 0)
-            compare = this.pos.compareTo(n.pos);
-            if(compare == 0)
-                compare = Boolean.compare(this.capa_azul, n.capa_azul);
-                if(compare == 0)
-                    compare = Boolean.compare(this.capa_roja, n.capa_roja);
-        return compare;
+        int cmp = Integer.compare((this.coste+(this.heuristica*(Nodo.HEURISTICA_ENABLED?1:0))), (n.coste+(n.heuristica*(Nodo.HEURISTICA_ENABLED?1:0))));
+        if (cmp == 0)
+            cmp = Integer.compare(this.pos.x, n.pos.x);
+            if (cmp == 0)
+                cmp = Integer.compare(this.pos.y, n.pos.y);
+                if (cmp == 0)
+                    cmp = Boolean.compare(this.capa_roja, n.capa_roja);
+                    if (cmp == 0)
+                        cmp = Boolean.compare(this.capa_azul, n.capa_azul);
+        return cmp;
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(pos, capa_roja, capa_azul);
+    }
+
 
     public ArrayList<Nodo> getHijos(ArrayList<ACTIONS> acciones) {
         ArrayList<Nodo> hijos = new ArrayList<Nodo>();
         for (ACTIONS a : acciones) {
-            Pair newPos = new Pair(this.pos);
+            Pair newPos = null;
             switch (a) {
                 case ACTION_UP:
-                    newPos.x -= 1;
+                    newPos = new Pair(pos.x - 1, pos.y);
                     break;
                 case ACTION_DOWN:
-                    newPos.x += 1;
+                    newPos = new Pair(pos.x + 1, pos.y);
                     break;
                 case ACTION_LEFT:
-                    newPos.y -= 1;
+                    newPos = new Pair(pos.x, pos.y - 1);
                     break;
                 case ACTION_RIGHT:
-                    newPos.y += 1;
+                    newPos = new Pair(pos.x, pos.y + 1);
                 default:
                     break;
             }
@@ -76,13 +93,13 @@ public class Nodo implements Comparable<Nodo> {
     }
 
     public ArrayList<ACTIONS> getActions() {
-        ArrayList<ACTIONS> acciones = new ArrayList<ACTIONS>();
-        Nodo actual = this;
-        while (actual.padre != null) {
-            acciones.add(actual.accion_padre);
-            actual = actual.padre;
-        }
-        Collections.reverse(acciones);
-        return acciones;
+        LinkedList<ACTIONS> acciones = new LinkedList<>();
+        for (Nodo actual = this; actual.padre != null; actual = actual.padre)
+            acciones.addFirst(actual.accion_padre);
+        return new ArrayList<>(acciones);
+    }
+    public void calculateHeuristic(Pair salida){
+        if (Nodo.HEURISTICA_ENABLED)
+        this.heuristica = Math.abs(this.pos.x - salida.x) + Math.abs(this.pos.y - salida.y);
     }
 }
