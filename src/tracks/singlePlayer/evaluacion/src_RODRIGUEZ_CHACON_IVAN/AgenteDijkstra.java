@@ -53,6 +53,8 @@ public class AgenteDijkstra extends AbstractPlayer {
         if (actual.pos.equals(tablero.salida)) {
             this.solution = true;
             this.actions = actual.getActions();
+            System.out.println("Abiertos: " + pendientes.size());
+            System.out.println("Cerrados: " + visitados.size());
         }
     }
     

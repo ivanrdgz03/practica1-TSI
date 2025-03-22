@@ -53,6 +53,8 @@ public class AgenteAStar extends AbstractPlayer {
         if (tablero.esSalida(actual.pos)) {
             this.solution = true;
             this.actions = actual.getActions();
+            System.out.println("Abiertos: " + pendientes.size());
+            System.out.println("Cerrados: " + visitados.size());
         }
     }
     
