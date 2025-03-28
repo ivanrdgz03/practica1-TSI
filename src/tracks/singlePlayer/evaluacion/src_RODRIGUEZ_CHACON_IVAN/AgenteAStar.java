@@ -55,6 +55,7 @@ public class AgenteAStar extends AbstractPlayer {
             this.actions = actual.getActions();
             System.out.println("Abiertos: " + pendientes.size());
             System.out.println("Cerrados: " + visitados.size());
+            System.out.println("Tamaño de la ruta: " + this.actions.size());
         }
     }
     
