@@ -35,13 +35,15 @@ public class AgenteDijkstra extends AbstractPlayer {
             visitados.add(actual);
             
             int capa = tablero.hayCapa(actual.pos);
-            if (capa < 0) {
+            if (capa < 0 && !actual.capas_usadas.contains(actual.pos)) {
                 actual.capa_roja = true;
                 actual.capa_azul = false;
+                actual.capas_usadas.add(actual.pos);
             }
-            if (capa > 0) {
+            if (capa > 0 && !actual.capas_usadas.contains(actual.pos)) {
                 actual.capa_azul = true;
                 actual.capa_roja = false;
+                actual.capas_usadas.add(actual.pos);
             }
             if (actual.pos.equals(tablero.salida))
                 break;

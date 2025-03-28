@@ -2,6 +2,7 @@ package tracks.singlePlayer.evaluacion.src_RODRIGUEZ_CHACON_IVAN;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Objects;
 
@@ -21,6 +22,7 @@ public class Nodo implements Comparable<Nodo> {
     public boolean capa_roja, capa_azul;
     public Nodo padre;
     public ACTIONS accion_padre;
+    public HashSet<Pair> capas_usadas;
 
     public Nodo(Pair pos, int coste, Nodo padre, ACTIONS accion_padre) {
         this.pos = pos;
@@ -30,6 +32,10 @@ public class Nodo implements Comparable<Nodo> {
         this.heuristica = 0;
         this.capa_azul = padre.capa_azul;
         this.capa_roja = padre.capa_roja;
+        if(padre.capas_usadas.size()>0)
+            this.capas_usadas = new HashSet<Pair>(padre.capas_usadas);
+        else
+            this.capas_usadas = new HashSet<Pair>();
     }
 
     public Nodo(Pair pos, int coste) {
@@ -39,13 +45,14 @@ public class Nodo implements Comparable<Nodo> {
         this.padre = null;
         this.capa_roja = false;
         this.capa_azul = false;
+        this.capas_usadas = new HashSet<Pair>();
     }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Nodo)) return false;
         Nodo n = (Nodo) o;
-        return (this.pos.x == n.pos.x && this.pos.y == n.pos.y && this.capa_azul == n.capa_azul && this.capa_roja == n.capa_roja);
+        return (this.pos.x == n.pos.x && this.pos.y == n.pos.y && this.capa_azul == n.capa_azul && this.capa_roja == n.capa_roja && this.capas_usadas.equals(n.capas_usadas));
     }
 
     @Override
@@ -64,7 +71,7 @@ public class Nodo implements Comparable<Nodo> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(pos, capa_roja, capa_azul);
+        return Objects.hash(pos, capa_roja, capa_azul, capas_usadas);
     }
 
 

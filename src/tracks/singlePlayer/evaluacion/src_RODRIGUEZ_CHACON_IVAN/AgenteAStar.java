@@ -28,18 +28,21 @@ public class AgenteAStar extends AbstractPlayer {
         pendientes.add(actual);
         while (!pendientes.isEmpty()) {
             actual = pendientes.poll();
+
             if(visitados.contains(actual))
-                continue;
+            continue;
 
             visitados.add(actual);
             int capa = tablero.hayCapa(actual.pos);
-            if (capa < 0) {
+            if (capa < 0 && !actual.capas_usadas.contains(actual.pos)) {
                 actual.capa_roja = true;
                 actual.capa_azul = false;
+                actual.capas_usadas.add(actual.pos);
             }
-            if (capa > 0) {
+            if (capa > 0 && !actual.capas_usadas.contains(actual.pos)) {
                 actual.capa_azul = true;
                 actual.capa_roja = false;
+                actual.capas_usadas.add(actual.pos);
             }
             if (tablero.esSalida(actual.pos)) {
                 break;
