@@ -52,13 +52,13 @@ public class Nodo implements Comparable<Nodo> {
     public int compareTo(Nodo n) {
         int cmp = Integer.compare((this.coste+(this.heuristica*(Nodo.HEURISTICA_ENABLED?1:0))), (n.coste+(n.heuristica*(Nodo.HEURISTICA_ENABLED?1:0))));
         if (cmp == 0)
-            cmp = Integer.compare(this.pos.x, n.pos.x);
+            cmp = Integer.compare(this.pos.y, n.pos.y);
             if (cmp == 0)
-                cmp = Integer.compare(this.pos.y, n.pos.y);
-                if (cmp == 0)
-                    cmp = Boolean.compare(this.capa_roja, n.capa_roja);
+                cmp = Integer.compare(this.pos.x, n.pos.x);
                     if (cmp == 0)
-                        cmp = Boolean.compare(this.capa_azul, n.capa_azul);
+                        cmp = Boolean.compare(this.capa_roja, n.capa_roja);
+                        if (cmp == 0)
+                            cmp = Boolean.compare(this.capa_azul, n.capa_azul);
         return cmp;
     }
 
