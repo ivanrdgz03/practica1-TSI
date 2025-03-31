@@ -9,7 +9,6 @@ import ontology.Types.ACTIONS;
 import tools.ElapsedCpuTimer;
 import tools.Vector2d;
 
-
 public class AgenteAStar extends AbstractPlayer {
     private boolean solution;
     private List<ACTIONS> actions;
@@ -20,7 +19,7 @@ public class AgenteAStar extends AbstractPlayer {
         actions = null;
         tablero = new Tablero(stateObs);
     }
-    
+
     public void doAStar() {
         Set<Nodo> visitados = new HashSet<>();
         PriorityQueue<Nodo> pendientes = new PriorityQueue<Nodo>();
@@ -28,11 +27,8 @@ public class AgenteAStar extends AbstractPlayer {
         pendientes.add(actual);
         while (!pendientes.isEmpty()) {
             actual = pendientes.poll();
+            if (visitados.contains(actual)) continue;
 
-            if(visitados.contains(actual))
-            continue;
-
-            visitados.add(actual);
             int capa = tablero.hayCapa(actual.pos);
             if (capa < 0 && !actual.capas_usadas.contains(actual.pos)) {
                 actual.capa_roja = true;
@@ -44,11 +40,15 @@ public class AgenteAStar extends AbstractPlayer {
                 actual.capa_roja = false;
                 actual.capas_usadas.add(actual.pos);
             }
+
+            visitados.add(actual);
+            
             if (tablero.esSalida(actual.pos)) {
                 break;
             }
+
             for (Nodo nodo : actual.getHijos(tablero.getAvailableActions(actual)))
-                if(!visitados.contains(nodo)){
+                if (!visitados.contains(nodo)) {
                     nodo.calculateHeuristic(tablero.salida);
                     pendientes.add(nodo);
                 }
@@ -61,10 +61,10 @@ public class AgenteAStar extends AbstractPlayer {
             System.out.println("Tamaño de la ruta: " + this.actions.size());
         }
     }
-    
+
     @Override
     public ACTIONS act(StateObservation stateObs, ElapsedCpuTimer elapsedTimer) {
-        if(!this.solution)
+        if (!this.solution)
             doAStar();
         if (this.solution && !this.actions.isEmpty()) {
             ACTIONS a = actions.get(0);

@@ -9,7 +9,6 @@ import ontology.Types.ACTIONS;
 import tools.ElapsedCpuTimer;
 import tools.Vector2d;
 
-
 public class AgenteDijkstra extends AbstractPlayer {
     private boolean solution;
     private List<ACTIONS> actions;
@@ -21,7 +20,7 @@ public class AgenteDijkstra extends AbstractPlayer {
         tablero = new Tablero(stateObs);
         Nodo.HEURISTICA_ENABLED = false;
     }
-    
+
     public void doDijkstra(Pair inicial) {
         Set<Nodo> visitados = new HashSet<>();
         PriorityQueue<Nodo> pendientes = new PriorityQueue<Nodo>();
@@ -29,11 +28,9 @@ public class AgenteDijkstra extends AbstractPlayer {
         pendientes.add(actual);
         while (!pendientes.isEmpty()) {
             actual = pendientes.poll();
-            if(visitados.contains(actual))
+            if (visitados.contains(actual))
                 continue;
 
-            visitados.add(actual);
-            
             int capa = tablero.hayCapa(actual.pos);
             if (capa < 0 && !actual.capas_usadas.contains(actual.pos)) {
                 actual.capa_roja = true;
@@ -48,8 +45,9 @@ public class AgenteDijkstra extends AbstractPlayer {
             if (actual.pos.equals(tablero.salida))
                 break;
 
+            visitados.add(actual);
             for (Nodo nodo : actual.getHijos(tablero.getAvailableActions(actual)))
-                if(!visitados.contains(nodo))
+                if (!visitados.contains(nodo))
                     pendientes.add(nodo);
         }
         if (actual.pos.equals(tablero.salida)) {
@@ -60,10 +58,10 @@ public class AgenteDijkstra extends AbstractPlayer {
             System.out.println("Tamaño de la ruta: " + this.actions.size());
         }
     }
-    
+
     @Override
     public ACTIONS act(StateObservation stateObs, ElapsedCpuTimer elapsedTimer) {
-        if(!this.solution)
+        if (!this.solution)
             doDijkstra(this.tablero.pos_inicial);
         if (this.solution && !this.actions.isEmpty()) {
             ACTIONS a = actions.get(0);

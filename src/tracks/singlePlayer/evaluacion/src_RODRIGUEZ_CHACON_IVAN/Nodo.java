@@ -32,7 +32,7 @@ public class Nodo implements Comparable<Nodo> {
         this.heuristica = 0;
         this.capa_azul = padre.capa_azul;
         this.capa_roja = padre.capa_roja;
-        if(padre.capas_usadas.size()>0)
+        if (padre.capas_usadas.size() > 0)
             this.capas_usadas = new HashSet<Pair>(padre.capas_usadas);
         else
             this.capas_usadas = new HashSet<Pair>();
@@ -47,33 +47,32 @@ public class Nodo implements Comparable<Nodo> {
         this.capa_azul = false;
         this.capas_usadas = new HashSet<Pair>();
     }
+
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Nodo)) return false;
+        if (this == o)
+            return true;
+        if (!(o instanceof Nodo))
+            return false;
         Nodo n = (Nodo) o;
-        return (this.pos.x == n.pos.x && this.pos.y == n.pos.y && this.capa_azul == n.capa_azul && this.capa_roja == n.capa_roja && this.capas_usadas.equals(n.capas_usadas));
+        return (this.pos.x == n.pos.x && this.pos.y == n.pos.y && this.capa_azul == n.capa_azul
+                && this.capa_roja == n.capa_roja && this.capas_usadas.equals(n.capas_usadas));
     }
 
     @Override
     public int compareTo(Nodo n) {
-        int cmp = Integer.compare((this.coste+(this.heuristica*(Nodo.HEURISTICA_ENABLED?1:0))), (n.coste+(n.heuristica*(Nodo.HEURISTICA_ENABLED?1:0))));
+        int cmp = Integer.compare((this.coste + this.heuristica), (n.coste + n.heuristica));
         if (cmp == 0)
-            cmp = Integer.compare(this.pos.y, n.pos.y);
-            if (cmp == 0)
-                cmp = Integer.compare(this.pos.x, n.pos.x);
-                    if (cmp == 0)
-                        cmp = Boolean.compare(this.capa_roja, n.capa_roja);
-                        if (cmp == 0)
-                            cmp = Boolean.compare(this.capa_azul, n.capa_azul);
+            cmp = Integer.compare(this.coste, n.coste);
+        if (cmp == 0)
+            cmp = 1;
         return cmp;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(pos, capa_roja, capa_azul, capas_usadas);
+        return Objects.hash(pos, capa_roja, capa_azul, capas_usadas.size());
     }
-
 
     public ArrayList<Nodo> getHijos(ArrayList<ACTIONS> acciones) {
         ArrayList<Nodo> hijos = new ArrayList<Nodo>();
@@ -105,8 +104,9 @@ public class Nodo implements Comparable<Nodo> {
             acciones.addFirst(actual.accion_padre);
         return new ArrayList<>(acciones);
     }
-    public void calculateHeuristic(Pair salida){
+
+    public void calculateHeuristic(Pair salida) {
         if (Nodo.HEURISTICA_ENABLED)
-        this.heuristica = Math.abs(this.pos.x - salida.x) + Math.abs(this.pos.y - salida.y);
+            this.heuristica = Math.abs(this.pos.x - salida.x) + Math.abs(this.pos.y - salida.y);
     }
 }
