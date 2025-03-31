@@ -47,7 +47,7 @@ public class AgenteAStar extends AbstractPlayer {
                 break;
             }
 
-            for (Nodo nodo : actual.getHijos(tablero.getAvailableActions(actual)))
+            for (Nodo nodo : actual.getHijos(tablero.getAviablesActions(actual)))
                 if (!visitados.contains(nodo)) {
                     nodo.calculateHeuristic(tablero.salida);
                     pendientes.add(nodo);

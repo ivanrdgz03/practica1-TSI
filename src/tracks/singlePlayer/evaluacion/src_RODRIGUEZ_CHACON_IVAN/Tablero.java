@@ -50,7 +50,7 @@ public class Tablero {
         int itype = grid[pos.y][pos.x].get(0).itype;
         return !(itype == 3 || itype == 5 || (itype== 6 && !capa_roja) || (itype==7 && !capa_azul));
     }
-    ArrayList<ACTIONS> getAvailableActions(Pair pos, boolean capa_azul, boolean capa_roja){
+    ArrayList<ACTIONS> getAviablesActions(Pair pos, boolean capa_azul, boolean capa_roja){
         ArrayList<ACTIONS> aviables = new ArrayList<ACTIONS>();
         if(isTransitable(new Pair(pos.x, pos.y+1), capa_azul, capa_roja))
             aviables.add(ACTIONS.ACTION_RIGHT);
@@ -64,8 +64,8 @@ public class Tablero {
         return aviables;
     }
 
-    ArrayList<ACTIONS> getAvailableActions(Nodo nodo){
-        return getAvailableActions(nodo.pos, nodo.capa_azul, nodo.capa_roja);
+    ArrayList<ACTIONS> getAviablesActions(Nodo nodo){
+        return getAviablesActions(nodo.pos, nodo.capa_azul, nodo.capa_roja);
     }
     public int hayCapa(Pair pos){
         if(pos.equals(this.capa_azul))
