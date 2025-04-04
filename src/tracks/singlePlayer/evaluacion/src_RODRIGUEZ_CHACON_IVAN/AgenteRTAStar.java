@@ -13,16 +13,26 @@ public class AgenteRTAStar extends AbstractPlayer {
     private HashMap<Nodo, Integer> tabla_hash;
     private Tablero tablero;
     private Nodo actual;
+    private int iteraciones;
+    private long tiempoTotalms;
 
     public AgenteRTAStar(StateObservation stateObs, ElapsedCpuTimer elapsedTimer) {
         this.tabla_hash = new HashMap<>();
         tablero = new Tablero(stateObs);
+        this.iteraciones = 0;
+        this.tiempoTotalms = 0;
         this.actual = new Nodo(tablero.pos_inicial, 0);
     }
 
     @Override
     public ACTIONS act(StateObservation stateObs, ElapsedCpuTimer elapsedTimer) {
+        long tInicio = System.nanoTime();
         int hayCapa = tablero.hayCapa(actual.pos);
+        if(actual.pos == this.tablero.salida){
+            System.out.println("Iteraciones: " + this.iteraciones);
+            System.out.println("Tiempo medio: " + this.tiempoTotalms/this.iteraciones + " ms");
+            return ACTIONS.ACTION_NIL;
+        }
         if (hayCapa < 0 && !actual.capas_usadas.contains(actual.pos)) {
             actual.capa_roja = true;
             actual.capa_azul = false;
@@ -52,6 +62,9 @@ public class AgenteRTAStar extends AbstractPlayer {
             tabla_hash.put(actual,actual.heuristica);
         }
         actual = mejor;
+        long tFin = System.nanoTime();
+        this.iteraciones++;
+        this.tiempoTotalms += (tFin - tInicio) / 1000000;
         return mejor.accion_padre;
     }
 };

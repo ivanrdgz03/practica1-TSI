@@ -21,6 +21,8 @@ public class AgenteAStar extends AbstractPlayer {
     }
 
     public void doAStar() {
+        long tInicio = System.nanoTime();
+
         Set<Nodo> visitados = new HashSet<>();
         PriorityQueue<Nodo> pendientes = new PriorityQueue<Nodo>();
         Nodo actual = new Nodo(tablero.pos_inicial, 0);
@@ -54,10 +56,13 @@ public class AgenteAStar extends AbstractPlayer {
                 }
         }
         if (tablero.esSalida(actual.pos)) {
+            long tFin = System.nanoTime();
+            long tiempoTotalms = (tFin - tInicio)/1000000;
             this.solution = true;
             this.actions = actual.getActions();
             System.out.println("Abiertos: " + pendientes.size());
             System.out.println("Cerrados: " + visitados.size());
+            System.out.println("Tiempo total: " + tiempoTotalms + " ms");
             System.out.println("Tamaño de la ruta: " + this.actions.size());
         }
     }
