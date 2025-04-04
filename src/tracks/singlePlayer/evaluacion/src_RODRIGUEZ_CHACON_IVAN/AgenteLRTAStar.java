@@ -13,7 +13,7 @@ public class AgenteLRTAStar extends AbstractPlayer {
     private HashMap<Nodo, Integer> tabla_hash;
     private Tablero tablero;
     private Nodo actual;
-    private int iteraciones;
+    private long iteraciones;
     private long tiempoTotalms;
 
     public AgenteLRTAStar(StateObservation stateObs, ElapsedCpuTimer elapsedTimer) {
@@ -22,16 +22,12 @@ public class AgenteLRTAStar extends AbstractPlayer {
         this.actual = this.tablero.getNodoInicial();
         this.iteraciones = 0;
         this.tiempoTotalms = 0;
+        Nodo.COSTE_ENABLED = false;
     }
 
     @Override
     public ACTIONS act(StateObservation stateObs, ElapsedCpuTimer elapsedTimer) {
         long tInicio = System.nanoTime();
-        if(this.tablero.esSalida(actual.pos)){
-            System.out.println("Iteraciones: " + this.iteraciones);
-            System.out.println("Tiempo medio: " + this.tiempoTotalms/this.iteraciones + " ms");
-            return ACTIONS.ACTION_NIL;
-        }
         PriorityQueue<Nodo> hijos = new PriorityQueue<>();
         for(Nodo hijo : this.tablero.getHijos(this.actual)){
             if(!this.tabla_hash.containsKey(hijo)){
@@ -43,14 +39,18 @@ public class AgenteLRTAStar extends AbstractPlayer {
             hijos.add(hijo);
         }
         Nodo mejor = hijos.poll();
-            if(mejor.heuristica>this.actual.heuristica){
-            this.actual.heuristica = mejor.heuristica;
+        if(mejor.heuristica+1>this.actual.heuristica){
+            this.actual.heuristica = mejor.heuristica+1;
             this.tabla_hash.put(this.actual,this.actual.heuristica);
         }
         this.actual = mejor;
         long tFin = System.nanoTime();
         this.iteraciones++;
-        this.tiempoTotalms += (tFin - tInicio) / 1000000;
+        this.tiempoTotalms += ((tFin - tInicio) / 1000000);
+        if(this.tablero.esSalida(actual.pos)){
+            System.out.println("Iteraciones: " + this.iteraciones);
+            System.out.println("Tiempo medio: " + this.tiempoTotalms/this.iteraciones + " ms");
+        }
         return mejor.accion_padre;
     }
 };

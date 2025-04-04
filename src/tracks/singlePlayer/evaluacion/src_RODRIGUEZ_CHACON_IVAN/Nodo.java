@@ -16,6 +16,7 @@ import tools.Vector2d;
 
 public class Nodo implements Comparable<Nodo> {
     public static boolean HEURISTICA_ENABLED = true;
+    public static boolean COSTE_ENABLED = true;
     public static int CONTADOR = 0;
     public Pair pos;
     public int coste, heuristica;
@@ -64,11 +65,18 @@ public class Nodo implements Comparable<Nodo> {
 
     @Override
     public int compareTo(Nodo n) {
-        int cmp = Integer.compare((this.coste + this.heuristica), (n.coste + n.heuristica));
-        if (cmp == 0)
-            cmp = Integer.compare(this.coste, n.coste);
-        if (cmp == 0)
-            cmp = Integer.compare(this.id, n.id);
+        int cmp = 0;
+        if(Nodo.COSTE_ENABLED){
+            cmp = Integer.compare((this.coste + this.heuristica), (n.coste + n.heuristica));
+            if (cmp == 0)
+                cmp = Integer.compare(this.coste, n.coste);
+            if (cmp == 0)
+                cmp = Integer.compare(this.id, n.id);
+        }else{
+            cmp = Integer.compare(this.heuristica, n.heuristica);
+            if (cmp == 0)
+                cmp = Integer.compare(this.id, n.id);
+        }
         return cmp;
     }
 
