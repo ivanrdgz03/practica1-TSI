@@ -41,7 +41,7 @@ public class Test {
 
 		// Game and level to play
 		int gameIdx = 59;	//Camel 15/ 59 practica
-		int levelIdx =5; // level names from 0 to 4 (game_lvlN.txt).
+		int levelIdx =6; // level names from 0 to 4 (game_lvlN.txt).
 		String gameName = games[gameIdx][1];
 		String game = games[gameIdx][0];
 		String level1 = game.replace(gameName, gameName + "_lvl" + levelIdx);
@@ -55,7 +55,7 @@ public class Test {
 		//ArcadeMachine.playOneGame(game, level1, recordActionsFile, seed);
 
 		// 2. This plays a game in a level by the controller.
-		ArcadeMachine.runOneGame(game, level1, visuals, dijkstraController/*sampleRHEAController*/, recordActionsFile, seed, 0);
+		ArcadeMachine.runOneGame(game, level1, visuals, aStarController/*sampleRHEAController*/, recordActionsFile, seed, 0);
 
 
 		// 3. This replays a game from an action file previously recorded

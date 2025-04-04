@@ -15,9 +15,9 @@ public class AgenteAStar extends AbstractPlayer {
     private Tablero tablero;
 
     public AgenteAStar(StateObservation stateObs, ElapsedCpuTimer elapsedTimer) {
-        solution = false;
-        actions = null;
-        tablero = new Tablero(stateObs);
+        this.solution = false;
+        this.actions = null;
+        this.tablero = new Tablero(stateObs);
     }
 
     public void doAStar() {
@@ -25,37 +25,26 @@ public class AgenteAStar extends AbstractPlayer {
 
         Set<Nodo> visitados = new HashSet<>();
         PriorityQueue<Nodo> pendientes = new PriorityQueue<Nodo>();
-        Nodo actual = new Nodo(tablero.pos_inicial, 0);
+        Nodo actual = this.tablero.getNodoInicial();
         pendientes.add(actual);
+
         while (!pendientes.isEmpty()) {
             actual = pendientes.poll();
             if (visitados.contains(actual)) continue;
 
-            int capa = tablero.hayCapa(actual.pos);
-            if (capa < 0 && !actual.capas_usadas.contains(actual.pos)) {
-                actual.capa_roja = true;
-                actual.capa_azul = false;
-                actual.capas_usadas.add(actual.pos);
-            }
-            if (capa > 0 && !actual.capas_usadas.contains(actual.pos)) {
-                actual.capa_azul = true;
-                actual.capa_roja = false;
-                actual.capas_usadas.add(actual.pos);
-            }
-
             visitados.add(actual);
             
-            if (tablero.esSalida(actual.pos)) {
+            if (this.tablero.esSalida(actual.pos)) {
                 break;
             }
-
-            for (Nodo nodo : actual.getHijos(tablero.getAviablesActions(actual)))
+            
+            for (Nodo nodo : this.tablero.getHijos(actual))
                 if (!visitados.contains(nodo)) {
-                    nodo.calculateHeuristic(tablero.salida);
+                    nodo.calculateHeuristic(this.tablero.salida);
                     pendientes.add(nodo);
                 }
         }
-        if (tablero.esSalida(actual.pos)) {
+        if (this.tablero.esSalida(actual.pos)) {
             long tFin = System.nanoTime();
             long tiempoTotalms = (tFin - tInicio)/1000000;
             this.solution = true;
@@ -72,8 +61,8 @@ public class AgenteAStar extends AbstractPlayer {
         if (!this.solution)
             doAStar();
         if (this.solution && !this.actions.isEmpty()) {
-            ACTIONS a = actions.get(0);
-            actions.remove(0);
+            ACTIONS a = this.actions.get(0);
+            this.actions.remove(0);
             return a;
         }
         return ACTIONS.ACTION_NIL;

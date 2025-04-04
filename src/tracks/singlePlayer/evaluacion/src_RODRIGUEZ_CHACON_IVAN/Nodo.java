@@ -16,13 +16,14 @@ import tools.Vector2d;
 
 public class Nodo implements Comparable<Nodo> {
     public static boolean HEURISTICA_ENABLED = true;
+    public static int CONTADOR = 0;
     public Pair pos;
-    public int coste;
-    public int heuristica;
+    public int coste, heuristica;
     public boolean capa_roja, capa_azul;
     public Nodo padre;
     public ACTIONS accion_padre;
     public HashSet<Pair> capas_usadas;
+    private int id;
 
     public Nodo(Pair pos, int coste, Nodo padre, ACTIONS accion_padre) {
         this.pos = pos;
@@ -36,6 +37,8 @@ public class Nodo implements Comparable<Nodo> {
             this.capas_usadas = new HashSet<Pair>(padre.capas_usadas);
         else
             this.capas_usadas = new HashSet<Pair>();
+        this.id = Nodo.CONTADOR;
+        Nodo.CONTADOR++;
     }
 
     public Nodo(Pair pos, int coste) {
@@ -65,37 +68,13 @@ public class Nodo implements Comparable<Nodo> {
         if (cmp == 0)
             cmp = Integer.compare(this.coste, n.coste);
         if (cmp == 0)
-            cmp = 1;
+            cmp = Integer.compare(this.id, n.id);
         return cmp;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(pos, capa_roja, capa_azul, capas_usadas.size());
-    }
-
-    public ArrayList<Nodo> getHijos(ArrayList<ACTIONS> acciones) {
-        ArrayList<Nodo> hijos = new ArrayList<Nodo>();
-        for (ACTIONS a : acciones) {
-            Pair newPos = null;
-            switch (a) {
-                case ACTION_UP:
-                    newPos = new Pair(pos.x - 1, pos.y);
-                    break;
-                case ACTION_DOWN:
-                    newPos = new Pair(pos.x + 1, pos.y);
-                    break;
-                case ACTION_LEFT:
-                    newPos = new Pair(pos.x, pos.y - 1);
-                    break;
-                case ACTION_RIGHT:
-                    newPos = new Pair(pos.x, pos.y + 1);
-                default:
-                    break;
-            }
-            hijos.add(new Nodo(newPos, coste + 1, this, a));
-        }
-        return hijos;
+        return Objects.hash(this.pos, this.capa_roja, this.capa_azul, this.capas_usadas.size());
     }
 
     public ArrayList<ACTIONS> getActions() {
