@@ -1,13 +1,10 @@
 package tracks.singlePlayer.evaluacion.src_RODRIGUEZ_CHACON_IVAN;
 
 import java.util.*;
-import core.game.Observation;
 import core.game.StateObservation;
 import core.player.AbstractPlayer;
-import ontology.Types;
 import ontology.Types.ACTIONS;
 import tools.ElapsedCpuTimer;
-import tools.Vector2d;
 
 public class AgenteLRTAStar extends AbstractPlayer {
     private HashMap<Nodo, Integer> tabla_hash;
@@ -28,22 +25,30 @@ public class AgenteLRTAStar extends AbstractPlayer {
     @Override
     public ACTIONS act(StateObservation stateObs, ElapsedCpuTimer elapsedTimer) {
         long tInicio = System.nanoTime();
-        PriorityQueue<Nodo> hijos = new PriorityQueue<>();
+        PriorityQueue<Nodo> hijos = new PriorityQueue<>();  // Cola de prioridad para ordenarlos por su heurística
+
+        // Generamos los hijos del nodo actual
         for(Nodo hijo : this.tablero.getHijos(this.actual)){
-            if(!this.tabla_hash.containsKey(hijo)){
-                hijo.calculateHeuristic(this.tablero.salida);
+            if(!this.tabla_hash.containsKey(hijo))  // Si no existe en la tabla hash, lo añadimos
                 this.tabla_hash.put(hijo,hijo.heuristica);
-            }else{
+            else    // Si ya existe, lo obtenemos de la tabla
                 hijo.heuristica = this.tabla_hash.get(hijo);
-            }
+            
             hijos.add(hijo);
         }
         Nodo mejor = hijos.poll();
-        if(mejor.heuristica+1>this.actual.heuristica){
-            this.actual.heuristica = mejor.heuristica+1;
+
+        // Si no hay hijos, no podemos avanzar y nos quedamos quietos
+        if(hijos.isEmpty())
+            return ACTIONS.ACTION_NIL;
+        
+        //Actualizamos la heurística del nodo actual en base a la del mejor
+        if((mejor.heuristica+1)>this.actual.heuristica){
+            this.actual.heuristica = (mejor.heuristica+1);
             this.tabla_hash.put(this.actual,this.actual.heuristica);
         }
         this.actual = mejor;
+        
         long tFin = System.nanoTime();
         this.iteraciones++;
         this.tiempoTotalms += ((tFin - tInicio) / 1000000);

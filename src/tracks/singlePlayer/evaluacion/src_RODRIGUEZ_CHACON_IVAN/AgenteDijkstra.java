@@ -1,13 +1,10 @@
 package tracks.singlePlayer.evaluacion.src_RODRIGUEZ_CHACON_IVAN;
 
 import java.util.*;
-import core.game.Observation;
 import core.game.StateObservation;
 import core.player.AbstractPlayer;
-import ontology.Types;
 import ontology.Types.ACTIONS;
 import tools.ElapsedCpuTimer;
-import tools.Vector2d;
 
 public class AgenteDijkstra extends AbstractPlayer {
     private boolean solution;
@@ -23,7 +20,7 @@ public class AgenteDijkstra extends AbstractPlayer {
 
     public void doDijkstra(Pair inicial) {
         long tInicio = System.nanoTime();
-        Set<Nodo> visitados = new HashSet<>();
+        HashSet<Nodo> visitados = new HashSet<>();
         PriorityQueue<Nodo> pendientes = new PriorityQueue<Nodo>();
         Nodo actual = this.tablero.getNodoInicial();
         pendientes.add(actual);
@@ -31,17 +28,19 @@ public class AgenteDijkstra extends AbstractPlayer {
         while (!pendientes.isEmpty()) {
             actual = pendientes.poll();
 
-            if (visitados.contains(actual)) continue;
+            if (visitados.contains(actual)) continue;   // Si ya ha sido visitado, lo ignoramos
             
-            visitados.add(actual);
+            visitados.add(actual);  // Añadimos a cerrados
             
-            if (this.tablero.esSalida(actual.pos))
+            if (this.tablero.esSalida(actual.pos))  // Si es la salida, salimos
             break;
             
+            // Si no es la salida, añadimos los hijos a abiertos
             for (Nodo nodo : this.tablero.getHijos(actual))
                 if (!visitados.contains(nodo))
                     pendientes.add(nodo);
         }
+        // Si hemos llegado a la salida, guardamos la solución e imprimimos los datos requeridos
         if (this.tablero.esSalida(actual.pos)) {
             long tFin = System.nanoTime();
             long tiempoTotalms = (tFin - tInicio) / 1000000;
@@ -55,9 +54,9 @@ public class AgenteDijkstra extends AbstractPlayer {
         
         @Override
         public ACTIONS act(StateObservation stateObs, ElapsedCpuTimer elapsedTimer) {
-            if (!this.solution)
+            if (!this.solution) //Si no tenemos un plan lo generamos
             doDijkstra(this.tablero.pos_inicial);
-        if (this.solution && !this.actions.isEmpty()) {
+        if (this.solution && !this.actions.isEmpty()) { //Si tenemos un plan y no hemos llegado al final lo seguimos
             ACTIONS a = this.actions.get(0);
             this.actions.remove(0);
             return a;
