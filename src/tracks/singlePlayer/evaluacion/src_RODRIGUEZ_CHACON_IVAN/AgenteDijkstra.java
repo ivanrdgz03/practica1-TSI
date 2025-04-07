@@ -1,6 +1,8 @@
 package tracks.singlePlayer.evaluacion.src_RODRIGUEZ_CHACON_IVAN;
 
-import java.util.*;
+import java.util.PriorityQueue;
+import java.util.HashSet;
+import java.util.List;
 import core.game.StateObservation;
 import core.player.AbstractPlayer;
 import ontology.Types.ACTIONS;
@@ -18,7 +20,7 @@ public class AgenteDijkstra extends AbstractPlayer {
         Nodo.HEURISTICA_ENABLED = false;
     }
 
-    public void doDijkstra(Pair inicial) {
+    private void doDijkstra() {
         long tInicio = System.nanoTime();
         HashSet<Nodo> visitados = new HashSet<>();
         PriorityQueue<Nodo> pendientes = new PriorityQueue<Nodo>();
@@ -52,10 +54,10 @@ public class AgenteDijkstra extends AbstractPlayer {
         }
     }
         
-        @Override
-        public ACTIONS act(StateObservation stateObs, ElapsedCpuTimer elapsedTimer) {
-            if (!this.solution) //Si no tenemos un plan lo generamos
-            doDijkstra(this.tablero.pos_inicial);
+    @Override
+    public ACTIONS act(StateObservation stateObs, ElapsedCpuTimer elapsedTimer) {
+        if (!this.solution) //Si no tenemos un plan lo generamos
+            doDijkstra();
         if (this.solution && !this.actions.isEmpty()) { //Si tenemos un plan y no hemos llegado al final lo seguimos
             ACTIONS a = this.actions.get(0);
             this.actions.remove(0);
@@ -63,4 +65,4 @@ public class AgenteDijkstra extends AbstractPlayer {
         }
         return ACTIONS.ACTION_NIL;
     }
-}
+};

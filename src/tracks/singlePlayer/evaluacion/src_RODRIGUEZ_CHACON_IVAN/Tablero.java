@@ -6,11 +6,11 @@ import core.game.StateObservation;
 import ontology.Types.ACTIONS;
 
 public class Tablero {
-    public ArrayList<Observation>[][] grid;
-    public Pair pos_inicial;
-    public Pair salida;
-    public HashSet<Pair> capa_roja;
-    public HashSet<Pair> capa_azul;
+    private ArrayList<Observation>[][] grid;
+    private Pair pos_inicial;
+    private Pair salida;
+    private HashSet<Pair> capa_roja;
+    private HashSet<Pair> capa_azul;
 
     public Tablero(StateObservation stateObs) {
         this.grid = stateObs.getObservationGrid();  // Obtenemos el grid de observaciones
@@ -38,7 +38,7 @@ public class Tablero {
      * @param capa_roja True si tiene la capa roja, false si no
      * @return True si es transitable, false si no
      */
-    boolean isTransitable(Pair pos, boolean capa_azul, boolean capa_roja){
+    private boolean isTransitable(Pair pos, boolean capa_azul, boolean capa_roja){
         if(pos.x < 0 || pos.x >= grid[0].length || pos.y < 0 || pos.y >= grid.length)   //Si se sale del mapa
             return false;
 
@@ -72,7 +72,7 @@ public class Tablero {
      * @param nodo Nodo a comprobar
      * @return  ArrayList de acciones disponibles
      */
-    ArrayList<ACTIONS> getAviablesActions(Nodo nodo){
+    private ArrayList<ACTIONS> getAviablesActions(Nodo nodo){
         return getAviablesActions(nodo.pos, nodo.capa_azul, nodo.capa_roja);
     }
     /**
@@ -80,7 +80,7 @@ public class Tablero {
      * @param pos Posicion a comprobar
      * @return Positivo si tiene capa azul, negativo si tiene capa roja y 0 si no tiene ninguna
      */
-    public int hayCapa(Pair pos){
+    private int hayCapa(Pair pos){
         if(this.capa_azul.contains(pos))
             return 1;
         if(this.capa_roja.contains(pos))

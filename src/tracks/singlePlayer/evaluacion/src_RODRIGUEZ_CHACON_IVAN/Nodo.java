@@ -9,14 +9,14 @@ import ontology.Types.ACTIONS;
 public class Nodo implements Comparable<Nodo> {
     public static boolean HEURISTICA_ENABLED = true;    // Habilitar o deshabilitar la heurística
     public static boolean COSTE_ENABLED = true;   // Habilitar o deshabilitar el coste
-    public static int CONTADOR = 0;
-    public Pair pos;
-    public int coste, heuristica;
-    public boolean capa_roja, capa_azul;
-    public Nodo padre;
-    public ACTIONS accion_padre;
-    public HashSet<Pair> capas_usadas;
+    private static int CONTADOR = 0;
     private int id;
+    Pair pos;
+    int coste, heuristica;
+    boolean capa_roja, capa_azul;
+    Nodo padre;
+    ACTIONS accion_padre;
+    HashSet<Pair> capas_usadas;
 
     public Nodo(Pair pos, int coste, Nodo padre, ACTIONS accion_padre) {
         this.pos = pos;
@@ -93,7 +93,7 @@ public class Nodo implements Comparable<Nodo> {
      * Calcula la heurística del nodo en base a la posición de salida solo si la heuristica está habilitada
      * @param salida
      */
-    public void calculateHeuristic(Pair salida) {
+    void calculateHeuristic(Pair salida) {
         if (Nodo.HEURISTICA_ENABLED)
             this.heuristica = Math.abs(this.pos.x - salida.x) + Math.abs(this.pos.y - salida.y);
     }

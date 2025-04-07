@@ -1,6 +1,8 @@
 package tracks.singlePlayer.evaluacion.src_RODRIGUEZ_CHACON_IVAN;
 
-import java.util.*;
+import java.util.PriorityQueue;
+import java.util.HashSet;
+import java.util.List;
 import core.game.StateObservation;
 import core.player.AbstractPlayer;
 import ontology.Types.ACTIONS;
@@ -17,7 +19,7 @@ public class AgenteAStar extends AbstractPlayer {
         this.tablero = new Tablero(stateObs);
     }
 
-    public void doAStar() {
+    private void doAStar() {
         long tInicio = System.nanoTime();
 
         HashSet<Nodo> visitados = new HashSet<>();
