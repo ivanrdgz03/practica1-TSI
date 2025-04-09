@@ -2,16 +2,13 @@ package tracks.singlePlayer.evaluacion.src_RODRIGUEZ_CHACON_IVAN;
 
 import ontology.Types.ACTIONS;
 
-import java.util.Comparator;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.LinkedList;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class NodoCompeticion implements Comparable<NodoCompeticion> {
+    static final int GEMAS_NECESARIAS = 9; // Número de gemas necesarias para salir
     public Pair pos;
     public int coste, heuristica;
     public NodoCompeticion padre;
@@ -19,6 +16,13 @@ public class NodoCompeticion implements Comparable<NodoCompeticion> {
     public ACTIONS accion_padre;
     public ACTIONS vista;
 
+    /**
+     * Constructor de un nodo
+     * @param pos Posicion del nodo
+     * @param padre Padre del nodo
+     * @param accion_padre Accion del padre
+     * @param vista_hijo Hacia donde mira el hijo
+     */
     public NodoCompeticion(Pair pos, NodoCompeticion padre, ACTIONS accion_padre, ACTIONS vista_hijo) {
         this.pos = pos;
         this.padre = padre;
@@ -26,18 +30,23 @@ public class NodoCompeticion implements Comparable<NodoCompeticion> {
         this.heuristica = 0;
         this.coste = padre.coste + 1;
         this.vista = vista_hijo;
-        if (!padre.gemas_capturadas.isEmpty()) // Si el padre tiene gemas capturadas, las copiamos
+        if (!padre.gemas_capturadas.isEmpty()) // Si el padre tiene gemas capturadas, las referenciamos
             this.gemas_capturadas = padre.gemas_capturadas;
         else
             this.gemas_capturadas = new HashSet<Pair>();
     }
 
+    /**
+     * Constructor de un nodo
+     * @param pos Posicion del nodo
+     * @param coste Coste del nodo
+     */
     public NodoCompeticion(Pair pos, int coste) {
         this.pos = pos;
         this.heuristica = 0;
         this.padre = null;
         this.coste = coste;
-        this.vista = ACTIONS.ACTION_RIGHT;
+        this.vista = ACTIONS.ACTION_RIGHT;  //Por defecto a la derecha
         this.gemas_capturadas = new HashSet<Pair>();
     }
 
@@ -66,12 +75,17 @@ public class NodoCompeticion implements Comparable<NodoCompeticion> {
             cmp = Integer.compare(this.coste, o.coste);
         return cmp;
     }
-
+    /**
+     * Selecciona la gema más cercana a la posición actual que aun no fue cogida
+     * @param start Posición actual
+     * @param allGems   Conjunto de gemas
+     * @return La gema más cercana a la posición actual
+     */
     private Pair selectBestGem(Pair start, Set<Pair> allGems) {
         int minDist = Integer.MAX_VALUE;
         Pair best = null;
         for (Pair gem : allGems) {
-            if (!this.gemas_capturadas.contains(gem)) {
+            if (!this.gemas_capturadas.contains(gem)) { // Si la gema no ha sido cogida
                 int dist = Math.abs(start.x - gem.x) + Math.abs(start.y - gem.y);
                 if (dist < minDist) {
                     minDist = dist;
@@ -81,55 +95,35 @@ public class NodoCompeticion implements Comparable<NodoCompeticion> {
         }
         return best;
     }
-
+    /**
+     * Calcula la heurística del nodo
+     * @param salida Posición de salida
+     * @param gemas Conjunto de todas las gemas
+     */
     public void calculateHeuristica(Pair salida, Set<Pair> gemas) {
         Pair posicion = this.pos;
-        if (gemas.size() < 9) {
+        if (gemas.size() < NodoCompeticion.GEMAS_NECESARIAS) { //Si no tenemos todas las gemas se calcula en funcion de la gema mas cercana
             Pair gema_cercana = selectBestGem(posicion, gemas);
             this.heuristica = Math.abs(posicion.x - gema_cercana.x) + Math.abs(posicion.y - gema_cercana.y);
-        } else {
+        } else {    // Si tenemos todas las gemas se calcula en funcion de la salida
             this.heuristica = Math.abs(posicion.x - salida.x) + Math.abs(posicion.y - salida.y);
         }
     }
-
+    /**
+     * Genera un nuevo nodo hijo a partir de la accion y las gemas existentes (requeridas para la heuristica)
+     * @param accion Accion a realizar
+     * @param gemas Conjunto de gemas
+     * @return  Nodo hijo
+     */
     public NodoCompeticion applyAction(ACTIONS accion, Set<Pair> gemas) {
         Pair pos_hijo = null;
         ACTIONS vista_hijo = this.vista;
-        switch (accion) {
-            case ACTION_UP:
-                if (this.vista == ACTIONS.ACTION_UP)
-                    pos_hijo = new Pair(this.pos.x - 1, this.pos.y);
-                else {
-                    pos_hijo = new Pair(this.pos.x, this.pos.y);
-                    vista_hijo = ACTIONS.ACTION_UP;
-                }
-                break;
-            case ACTION_DOWN:
-                if (this.vista == ACTIONS.ACTION_DOWN)
-                    pos_hijo = new Pair(this.pos.x + 1, this.pos.y);
-                else {
-                    pos_hijo = new Pair(this.pos.x, this.pos.y);
-                    vista_hijo = ACTIONS.ACTION_DOWN;
-                }
-                break;
-            case ACTION_LEFT:
-                if (this.vista == ACTIONS.ACTION_LEFT)
-                    pos_hijo = new Pair(this.pos.x, this.pos.y - 1);
-                else {
-                    pos_hijo = new Pair(this.pos.x, this.pos.y);
-                    vista_hijo = ACTIONS.ACTION_LEFT;
-                }
-                break;
-            case ACTION_RIGHT:
-                if (this.vista == ACTIONS.ACTION_RIGHT)
-                    pos_hijo = new Pair(this.pos.x, this.pos.y + 1);
-                else {
-                    pos_hijo = new Pair(this.pos.x, this.pos.y);
-                    vista_hijo = ACTIONS.ACTION_RIGHT;
-                }
-                break;
-            case ACTION_NIL:
-                return this;
+        Pair delta = Direcciones.direcciones.get(accion);
+        if(this.vista == accion)
+            pos_hijo = new Pair(this.pos.x + delta.x, this.pos.y + delta.y);
+        else{
+            pos_hijo = new Pair(this.pos.x, this.pos.y);
+            vista_hijo = accion;
         }
         NodoCompeticion nodo_hijo = new NodoCompeticion(pos_hijo, this, accion, vista_hijo);
         if (gemas.contains(pos_hijo) && !this.gemas_capturadas.contains(pos_hijo)) {
@@ -138,7 +132,10 @@ public class NodoCompeticion implements Comparable<NodoCompeticion> {
         }
         return nodo_hijo;
     }
-
+    /**
+     * Devuelve la lista de acciones desde el nodo inicial hasta el nodo actual
+     * @return  Lista de acciones
+     */
     public LinkedList<ACTIONS> getActions() {
         LinkedList<ACTIONS> actions = new LinkedList<>();
         NodoCompeticion nodo = this;

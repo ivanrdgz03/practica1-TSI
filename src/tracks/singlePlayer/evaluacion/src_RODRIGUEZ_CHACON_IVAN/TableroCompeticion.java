@@ -3,7 +3,6 @@ package tracks.singlePlayer.evaluacion.src_RODRIGUEZ_CHACON_IVAN;
 import ontology.Types.ACTIONS;
 import core.game.Observation;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.HashSet;
 import core.game.StateObservation;
 
@@ -14,6 +13,10 @@ public class TableroCompeticion {
     public HashSet<Pair> gemas;
     public HashSet<Pair> monstruos;
 
+    /**
+     * Constructor de la clase TableroCompeticion
+     * @param stateObs Estado de la observación
+     */
     public TableroCompeticion(StateObservation stateObs) {
         this.grid = stateObs.getObservationGrid();  // Obtenemos el grid de observaciones
         this.pos_inicial = null;
@@ -34,16 +37,31 @@ public class TableroCompeticion {
                     }
                 }
     }
-    public NodoCompeticion getNodoInicial(NodoCompeticion inicial, ACTIONS vista) {
+    /**
+     * Genera el nodo inicial para la busqueda de A*
+     * @param inicial Nodo actual
+     * @return  Nodo inicial para la busqueda (copia con coste reseteado, heuristica calculada y padre nulo)
+     */
+    public NodoCompeticion getNodoInicial(NodoCompeticion inicial) {
         NodoCompeticion nodo = new NodoCompeticion(inicial.pos, 0);
-        nodo.vista = vista; // Asignamos la vista al nodo inicial
+        nodo.vista = inicial.vista; // Asignamos la vista al nodo inicial
         nodo.gemas_capturadas = inicial.gemas_capturadas;
         nodo.calculateHeuristica(inicial.pos, this.gemas); // Calculamos la heurística del nodo inicial
         return nodo;
     }
+    /**
+     * Comprueba si el nodo es la salida y si se tiene el requisito para salir (tenemos todas las gemas)
+     * @param nodo  Nodo a comprobar
+     * @return  true si el nodo es la salida y se tienen todas las gemas necesarias, false en caso contrario
+     */
     public boolean esSalida(NodoCompeticion nodo) {
-        return (this.salida.equals(nodo.pos) && nodo.gemas_capturadas.size()>=9); // Comprobamos si el nodo es la salida y si ha recogido todas las gemas
+        return (this.salida.equals(nodo.pos) && nodo.gemas_capturadas.size()>=NodoCompeticion.GEMAS_NECESARIAS); // Comprobamos si el nodo es la salida y si ha recogido todas las gemas
     }
+    /**
+     * Comprueba si la posición es transitable
+     * @param pos Posición a comprobar
+     * @return true si la posición es transitable, false en caso contrario
+     */
     public boolean isTransitable(Pair pos){
         if(pos.x < 0 || pos.x >= this.grid[0].length || pos.y < 0 || pos.y >= this.grid.length) // Si la posición está fuera del grid, no es transitable
             return false;
@@ -52,16 +70,21 @@ public class TableroCompeticion {
         int tipo = this.grid[pos.y][pos.x].get(0).itype;
         return (tipo != 0 && tipo != 8); // Si no es un muro ni una trampa, es transitable
     }
+    /**
+     * Comprueba si la posición es transitable en función de la acción
+     * @param pos Posición a comprobar
+     * @param accion Acción a realizar
+     * @return true si la posición es transitable, false en caso contrario
+     */
     public boolean isTransitable(Pair pos, ACTIONS accion) {
-        Pair pos_hijo = null;
-        switch (accion) {
-            case ACTION_UP: pos_hijo = new Pair(pos.x - 1, pos.y); break;
-            case ACTION_DOWN: pos_hijo = new Pair(pos.x + 1, pos.y); break;
-            case ACTION_LEFT: pos_hijo = new Pair(pos.x, pos.y - 1); break;
-            case ACTION_RIGHT: pos_hijo = new Pair(pos.x, pos.y + 1); break;
-        }
-        return isTransitable(pos_hijo);
+        Pair delta = Direcciones.direcciones.get(accion);
+        return isTransitable(new Pair(pos.x + delta.x, pos.y + delta.y));
     }
+    /**
+     * Devuelve la lista de acciones posibles desde el nodo actual
+     * @param nodo Nodo actual
+     * @return Lista de acciones posibles
+     */
     public ArrayList<ACTIONS> getAcciones(NodoCompeticion nodo) {
         ArrayList<ACTIONS> acciones = new ArrayList<ACTIONS>(4);
         if (isTransitable(nodo.pos, ACTIONS.ACTION_RIGHT))
@@ -74,6 +97,11 @@ public class TableroCompeticion {
             acciones.add(ACTIONS.ACTION_DOWN);
         return acciones;
     }
+    /**
+     * Devuelve la lista de nodos hijos a partir del nodo padre
+     * @param nodo Nodo padre
+     * @return Lista de nodos hijos
+     */
     public ArrayList<NodoCompeticion> getHijos(NodoCompeticion nodo) {
         ArrayList<NodoCompeticion> hijos = new ArrayList<NodoCompeticion>();
         ArrayList<ACTIONS> acciones = getAcciones(nodo);
@@ -83,11 +111,17 @@ public class TableroCompeticion {
         }
         return hijos;
     }
-    public void update(NodoCompeticion nodo, StateObservation stateObs) {
+
+    /**
+     * Actualiza el grid de observaciones, las gemas y los monstruos
+     * @param stateObs Estado de la observación
+     */
+    public void update(StateObservation stateObs) {
         this.grid = stateObs.getObservationGrid();  // Obtenemos el grid de observaciones
         this.monstruos.clear();
         this.gemas.clear();
 
+        // Recorremos el grid y buscamos la posición inicial, la salida y las gemas
         for (int i = 1; i < this.grid.length; i++)
             for (int j = 1; j < this.grid[0].length; j++)
                 if (!this.grid[i][j].isEmpty()){
@@ -102,7 +136,7 @@ public class TableroCompeticion {
     
 };
 
-
+// Esta es una lista de los itypes de los objetos que pueden aparecer en el grid
 /*
  * 0 = muro
  * 1 = pos_inicial
