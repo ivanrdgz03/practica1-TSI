@@ -38,7 +38,7 @@ public class TableroCompeticion {
         NodoCompeticion nodo = new NodoCompeticion(inicial.pos, 0);
         nodo.vista = vista; // Asignamos la vista al nodo inicial
         nodo.gemas_capturadas = inicial.gemas_capturadas;
-        nodo.calculateHeuristica(inicial.pos, new ArrayList<Pair>(this.gemas)); // Calculamos la heurística del nodo inicial
+        nodo.calculateHeuristica(inicial.pos, this.gemas); // Calculamos la heurística del nodo inicial
         return nodo;
     }
     public boolean esSalida(NodoCompeticion nodo) {
@@ -63,7 +63,7 @@ public class TableroCompeticion {
         return isTransitable(pos_hijo);
     }
     public ArrayList<ACTIONS> getAcciones(NodoCompeticion nodo) {
-        ArrayList<ACTIONS> acciones = new ArrayList<ACTIONS>();
+        ArrayList<ACTIONS> acciones = new ArrayList<ACTIONS>(4);
         if (isTransitable(nodo.pos, ACTIONS.ACTION_RIGHT))
             acciones.add(ACTIONS.ACTION_RIGHT);
         if (isTransitable(nodo.pos, ACTIONS.ACTION_LEFT))
@@ -78,7 +78,7 @@ public class TableroCompeticion {
         ArrayList<NodoCompeticion> hijos = new ArrayList<NodoCompeticion>();
         ArrayList<ACTIONS> acciones = getAcciones(nodo);
         for (ACTIONS a : acciones) {
-            NodoCompeticion hijo = nodo.applyAction(a, new ArrayList<>(this.gemas)); // Aplicamos la acción al nodo padre
+            NodoCompeticion hijo = nodo.applyAction(a, this.gemas); // Aplicamos la acción al nodo padre
             hijos.add(hijo);
         }
         return hijos;
@@ -98,14 +98,6 @@ public class TableroCompeticion {
                         case 12: this.monstruos.add(new Pair(j, i)); break;
                     }
                 }
-    }
-    public Pair dangerous(NodoCompeticion actual){
-        for(Pair monstruo : this.monstruos){
-            if(Math.abs(monstruo.x - actual.pos.x) + Math.abs(monstruo.y - actual.pos.y) == 2){
-                return monstruo;
-            }
-        }
-        return null;
     }
     
 };
