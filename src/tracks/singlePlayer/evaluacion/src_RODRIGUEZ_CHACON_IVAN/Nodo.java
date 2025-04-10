@@ -27,7 +27,7 @@ public class Nodo implements Comparable<Nodo> {
         this.capa_azul = padre.capa_azul;
         this.capa_roja = padre.capa_roja;
         if (padre.capas_usadas.size() > 0)  // Si el padre tiene capas usadas, las copiamos
-            this.capas_usadas = new HashSet<Pair>(padre.capas_usadas);
+            this.capas_usadas = padre.capas_usadas; //Se hace copia de la referencia para optimizar, si se agrega alguna antes se realiza una copia y así optimizamos en espacio y tiempo
         else
             this.capas_usadas = new HashSet<Pair>();
         this.id = Nodo.CONTADOR;    // Asignamos un id único al nodo

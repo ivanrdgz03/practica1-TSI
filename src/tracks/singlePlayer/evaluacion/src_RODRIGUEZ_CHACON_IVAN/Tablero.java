@@ -112,11 +112,13 @@ public class Tablero {
         if (capa < 0 && !nodo.capas_usadas.contains(nodo.pos)) {    //Si tiene capa roja y no la ha usado
             nodo.capa_roja = true;
             nodo.capa_azul = false;
+            nodo.capas_usadas = new HashSet<Pair>(nodo.capas_usadas); // Copiamos el set para no modificar el original
             nodo.capas_usadas.add(nodo.pos);
         }
         if (capa > 0 && !nodo.capas_usadas.contains(nodo.pos)) {    //Si tiene capa azul y no la ha usado
             nodo.capa_azul = true;
             nodo.capa_roja = false;
+            nodo.capas_usadas = new HashSet<Pair>(nodo.capas_usadas); // Copiamos el set para no modificar el original
             nodo.capas_usadas.add(nodo.pos);
         }
     }
