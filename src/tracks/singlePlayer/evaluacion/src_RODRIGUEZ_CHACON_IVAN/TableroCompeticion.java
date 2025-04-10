@@ -55,7 +55,7 @@ public class TableroCompeticion {
      * @return  true si el nodo es la salida y se tienen todas las gemas necesarias, false en caso contrario
      */
     public boolean esSalida(NodoCompeticion nodo) {
-        return (this.salida.equals(nodo.pos) && nodo.gemas_capturadas.size()>=NodoCompeticion.GEMAS_NECESARIAS); // Comprobamos si el nodo es la salida y si ha recogido todas las gemas
+        return (this.salida.equals(nodo.pos) && (nodo.gemas_capturadas.size()>=NodoCompeticion.GEMAS_NECESARIAS || nodo.gemas_capturadas.size() == this.gemas.size())); // Comprobamos si el nodo es la salida y si ha recogido todas las gemas
     }
     /**
      * Comprueba si la posición es transitable
@@ -77,7 +77,7 @@ public class TableroCompeticion {
      * @return true si la posición es transitable, false en caso contrario
      */
     public boolean isTransitable(Pair pos, ACTIONS accion) {
-        Pair delta = Direcciones.direcciones.get(accion);
+        Pair delta = Direcciones.direcciones.get(accion); // Obtenemos el delta de la acción
         return isTransitable(new Pair(pos.x + delta.x, pos.y + delta.y));
     }
     /**
@@ -86,14 +86,22 @@ public class TableroCompeticion {
      * @return Lista de acciones posibles
      */
     public ArrayList<ACTIONS> getAcciones(NodoCompeticion nodo) {
+        return getAcciones(nodo.pos);
+    }
+        /**
+     * Devuelve la lista de acciones posibles desde la posición actual
+     * @param pos Posición actual
+     * @return Lista de acciones posibles
+     */
+    public ArrayList<ACTIONS> getAcciones(Pair pos) {
         ArrayList<ACTIONS> acciones = new ArrayList<ACTIONS>(4);
-        if (isTransitable(nodo.pos, ACTIONS.ACTION_RIGHT))
+        if (isTransitable(pos, ACTIONS.ACTION_RIGHT))
             acciones.add(ACTIONS.ACTION_RIGHT);
-        if (isTransitable(nodo.pos, ACTIONS.ACTION_LEFT))
+        if (isTransitable(pos, ACTIONS.ACTION_LEFT))
             acciones.add(ACTIONS.ACTION_LEFT);
-        if (isTransitable(nodo.pos, ACTIONS.ACTION_UP)) 
+        if (isTransitable(pos, ACTIONS.ACTION_UP)) 
             acciones.add(ACTIONS.ACTION_UP);
-        if (isTransitable(nodo.pos, ACTIONS.ACTION_DOWN))
+        if (isTransitable(pos, ACTIONS.ACTION_DOWN))
             acciones.add(ACTIONS.ACTION_DOWN);
         return acciones;
     }

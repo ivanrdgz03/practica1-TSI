@@ -102,8 +102,8 @@ public class NodoCompeticion implements Comparable<NodoCompeticion> {
      */
     public void calculateHeuristica(Pair salida, Set<Pair> gemas) {
         Pair posicion = this.pos;
-        if (gemas.size() < NodoCompeticion.GEMAS_NECESARIAS) { //Si no tenemos todas las gemas se calcula en funcion de la gema mas cercana
-            Pair gema_cercana = selectBestGem(posicion, gemas);
+        Pair gema_cercana = selectBestGem(posicion, gemas);
+        if (gemas.size() < NodoCompeticion.GEMAS_NECESARIAS && gema_cercana != null) { //Si no tenemos todas las gemas se calcula en funcion de la gema mas cercana si es que quedan gemas libres
             this.heuristica = Math.abs(posicion.x - gema_cercana.x) + Math.abs(posicion.y - gema_cercana.y);
         } else {    // Si tenemos todas las gemas se calcula en funcion de la salida
             this.heuristica = Math.abs(posicion.x - salida.x) + Math.abs(posicion.y - salida.y);

@@ -53,7 +53,7 @@ public class AgenteCompeticion extends AbstractPlayer {
 
             // Penalizacion por giro en funcion de la situacion actual, a peor sea la
             // situacion mas penaliza girar
-            double penalizacionGiro = (this.actual.vista != accion) ? Math.max(10, 100 - peligroInmediato) : 0;
+            double penalizacionGiro = (this.actual.vista != accion) ? 3000 : 0;
 
             // Calcular puntuacion total en base a los peligros y la penalizacion
             // Por ahora los porcentajes que mejor se ajustan son estos, aunque
@@ -89,31 +89,36 @@ public class AgenteCompeticion extends AbstractPlayer {
         double distanciaMinima = Double.MAX_VALUE;
 
         for (Pair enemigo : this.tablero.monstruos) {
-            double distancia = Math.hypot(pos.x - enemigo.x, pos.y - enemigo.y); // Distancia euclídea, aun siendo un
-                                                                                 // jueo sin movimientos en diagonal
-                                                                                 // extrañamente es la que mejores
-                                                                                 // resultados da
-            distanciaMinima = Math.min(distanciaMinima, distancia);
-
-            // Aumentar el peligro en función de la distancia a los enemigos
-            // Se usa la exponencial para que penalice mucho a las cercanas y rapidamente
-            // descienda el peligro a medida que se aleja
-            // Se divide por (1 + distancia) para que el peligro no crezca exageradamente
-            // El valor 0.8 es un parámetro que puede ajustarse mucho mas, hice pocas
-            // pruebas con el ya que son demasiados parametros
-            peligro += 100000 * Math.exp(-distancia * 0.8) / (1 + distancia);
-
-            // Se obtiene un bonus de peligro si el enemigo está en la misma fila o columna,
-            // el 150% es un parametro que me funciona bien
-            if (pos.x == enemigo.x || pos.y == enemigo.y) {
-                peligro *= 1.5;
+            // Calcular distancia Manhattan
+            int dx = Math.abs(pos.x - enemigo.x);
+            int dy = Math.abs(pos.y - enemigo.y);
+            
+            // Ignorar enemigos más allá de 3 casillas de distancia Manhattan
+            if (dx > 3 || dy > 3) {
+                continue;
             }
-        }
+            
+            double distancia = dx + dy;
+            // Actualizar distancia mínima
+            distanciaMinima = Math.min(distanciaMinima, distancia);
+            
+            // Calcular contribución de peligro para este enemigo
+            double contribucion = 100000 * Math.exp(-distancia * 0.8) / (1 + distancia);
+            
+            // Bonus si está en la misma fila o columna (dx o dy es 0)
+            if (dx == 0 || dy == 0) {
+                contribucion +=2000;
+            }
+            
+            int posibles_movimientos = this.tablero.getAcciones(pos).size();
+            if (posibles_movimientos <= 2) {    //Si el jugador se arrincona aumenta el peligro
+                double penalizacionSalida = (posibles_movimientos == 1) ? 6000 : 4000;
+                contribucion += penalizacionSalida;
+            }
 
-        // Penalización adicional si está cerca de zonas a las que pueden llegar
-        Set<Pair> zonasPeligrosas = predecirPosicionesPeligrosas(2);
-        if (zonasPeligrosas.contains(pos)) {
-            peligro += 1000000; // Estamos en una zona peligrosa y debemos huir inmediatamente
+
+
+            peligro += contribucion;
         }
 
         return peligro;
@@ -174,11 +179,15 @@ public class AgenteCompeticion extends AbstractPlayer {
                 posActual.y + direccion.y * 2);
 
         // Verificar si la posición futura es válida
+        Pair siguiente_posicion = new Pair(posActual.x + direccion.x, posActual.y + direccion.y);
         if (!this.tablero.isTransitable(posFutura)) {
-            return Double.MAX_VALUE;
+            if(this.tablero.isTransitable(siguiente_posicion))
+                return calcularPeligroInmediato(siguiente_posicion); // Si la posición futura no es transitable, devolvemos el máximo
+            else
+                return 1000;
         }
 
-        return calcularPeligroInmediato(posFutura);
+        return (calcularPeligroInmediato(posFutura)+2*calcularPeligroInmediato(siguiente_posicion))/3;
     }
 
     private void planificador(ElapsedCpuTimer elapsedTimer) {
