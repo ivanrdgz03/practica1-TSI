@@ -223,7 +223,7 @@ public class AgenteCompeticion extends AbstractPlayer {
     @Override
     public ACTIONS act(StateObservation stateObs, ElapsedCpuTimer elapsedTimer) {
         this.tablero.update(stateObs); // Actualizamos el tablero
-        final int UMBRAL_PELIGRO = 1000; // Valor umbral para el peligro
+        final int UMBRAL_PELIGRO = 500; // Valor umbral para el peligro
         // Si el agente está en una posición peligrosa, reaccionamos
         if (this.calcularPeligroInmediato(this.actual.pos) > UMBRAL_PELIGRO) {
             ACTIONS a = reaccionarAEnemigos();
