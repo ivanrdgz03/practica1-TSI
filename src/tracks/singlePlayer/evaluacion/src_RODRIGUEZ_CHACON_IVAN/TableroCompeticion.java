@@ -124,8 +124,8 @@ public class TableroCompeticion {
         // Recorremos el grid y buscamos la posición inicial, la salida y las gemas
         for (int i = 1; i < this.grid.length; i++)
             for (int j = 1; j < this.grid[0].length; j++)
-                if (!this.grid[i][j].isEmpty()){
-                    int tipo = this.grid[i][j].get(0).itype;
+                for (Observation obs : this.grid[i][j]) {
+                    int tipo = obs.itype;
                     switch (tipo) {
                         case 6: this.gemas.add(new Pair(j, i)); break;
                         case 11: 

@@ -11,7 +11,8 @@ public final class Direcciones {
             ACTIONS.ACTION_UP, new Pair(-1,0),
             ACTIONS.ACTION_DOWN, new Pair(1,0),
             ACTIONS.ACTION_LEFT, new Pair(0,-1),
-            ACTIONS.ACTION_RIGHT, new Pair(0,1));
+            ACTIONS.ACTION_RIGHT, new Pair(0,1),
+            ACTIONS.ACTION_NIL, new Pair(0,0));
 
     Direcciones() {}
 };
