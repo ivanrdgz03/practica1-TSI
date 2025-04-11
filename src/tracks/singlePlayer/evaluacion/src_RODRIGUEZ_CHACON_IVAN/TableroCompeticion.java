@@ -115,6 +115,7 @@ public class TableroCompeticion {
         ArrayList<ACTIONS> acciones = getAcciones(nodo);
         for (ACTIONS a : acciones) {
             NodoCompeticion hijo = nodo.applyAction(a, this.gemas); // Aplicamos la acción al nodo padre
+            hijo.calculateHeuristica(salida, gemas);
             hijos.add(hijo);
         }
         return hijos;

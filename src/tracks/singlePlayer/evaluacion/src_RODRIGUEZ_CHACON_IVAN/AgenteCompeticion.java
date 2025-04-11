@@ -209,7 +209,7 @@ public class AgenteCompeticion extends AbstractPlayer {
                     || this.tablero.esSalida(nodo_actual)) {
                 break;
             }
-            if (elapsedTimer.remainingTimeMillis() < 10) {
+            if (elapsedTimer.remainingTimeMillis() < 3) {
                 break;
             }
             // Si no es la salida, añadimos los hijos a abiertos
