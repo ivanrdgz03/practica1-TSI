@@ -7,12 +7,9 @@ import tools.ElapsedCpuTimer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.Set;
 
 public class AgenteCompeticion extends AbstractPlayer {
     private boolean solution;
@@ -30,13 +27,12 @@ public class AgenteCompeticion extends AbstractPlayer {
 
     /**
      * Reacciona a los enemigos en el tablero, eligiendo la mejor acción,se podría
-     * considerar como el agente reactivo
+     * considerar como la función principal del agente reactivo
      * 
      * @return la mejor acción a realizar
      */
     private ACTIONS reaccionarAEnemigos() {
-        ArrayList<ACTIONS> accionesDisponibles = this.tablero.getAcciones(this.actual); // Obtenemos las acciones
-                                                                                        // disponibles
+        ArrayList<ACTIONS> accionesDisponibles = this.tablero.getAcciones(this.actual); // Obtenemos las acciones disponibles
         if (accionesDisponibles.isEmpty()) // Si no hay acciones disponibles, devolvemos nil
             return ACTIONS.ACTION_NIL;
 
@@ -47,17 +43,14 @@ public class AgenteCompeticion extends AbstractPlayer {
             Pair nuevaPos = new Pair(this.actual.pos.x + delta.x, this.actual.pos.y + delta.y);
 
             // Calcular peligro con las posiciones actuales y con la prediccion en dos
-            // turnos
+            // turnos siguiendo la misma dirección
             double peligroInmediato = calcularPeligroInmediato(nuevaPos);
             double peligroFuturo = predecirPeligroFuturo(nuevaPos, delta);
 
-            // Penalizacion por giro en funcion de la situacion actual, a peor sea la
-            // situacion mas penaliza girar
+            // Penalizacion por giro
             double penalizacionGiro = (this.actual.vista != accion) ? 3000 : 0;
 
             // Calcular puntuacion total en base a los peligros y la penalizacion
-            // Por ahora los porcentajes que mejor se ajustan son estos, aunque
-            // automatizando la búsqueda de parámetros pienso que se podría mejorar
             double puntuacionTotal = peligroInmediato * 0.7 + peligroFuturo * 0.3 + penalizacionGiro;
 
             puntuaciones.put(accion, puntuacionTotal); // Guardamos la puntuacion de cada accion
@@ -88,6 +81,7 @@ public class AgenteCompeticion extends AbstractPlayer {
         double peligro = 0;
         double distanciaMinima = Double.MAX_VALUE;
 
+        //Para cada monstruo
         for (Pair enemigo : this.tablero.monstruos) {
             // Calcular distancia Manhattan
             int dx = Math.abs(pos.x - enemigo.x);
@@ -102,8 +96,8 @@ public class AgenteCompeticion extends AbstractPlayer {
             // Actualizar distancia mínima
             distanciaMinima = Math.min(distanciaMinima, distancia);
             
-            // Calcular contribución de peligro para este enemigo
-            double contribucion = 100000 * Math.exp(-distancia * 0.8) / (1 + distancia);
+            // Calcular contribución de peligro para este enemigo (está más detallado en la documentación)
+            double contribucion = 100000 * Math.exp(-distancia * 0.8);
             
             // Bonus si está en la misma fila o columna (dx o dy es 0)
             if (dx == 0 || dy == 0) {
@@ -125,46 +119,6 @@ public class AgenteCompeticion extends AbstractPlayer {
     }
 
     /**
-     * Predice las posiciones peligrosas a las que los monstruos pueden llegar en un
-     * número determinado de turnos
-     * 
-     * @param profundidad Número de turnos a predecir
-     * @return Conjunto de posiciones peligrosas
-     */
-    private Set<Pair> predecirPosicionesPeligrosas(int profundidad) {
-        Set<Pair> peligros = new HashSet<>();
-        // Realizamos una búsqueda en anchura para encontrar las posiciones al alcance
-        // de los monstruos
-        for (Pair monstruo : this.tablero.monstruos) {
-            Queue<Pair> cola = new LinkedList<>();
-            Set<Pair> visitados = new HashSet<>();
-            cola.add(monstruo);
-            visitados.add(monstruo);
-
-            int nivel = 0;
-            while (!cola.isEmpty() && nivel < profundidad) {
-                int size = cola.size();
-                // Recorremos todos los nodos del nivel actual y los añadimos a peligros
-                for (int i = 0; i < size; i++) {
-                    Pair actual = cola.poll();
-                    peligros.add(actual);
-                    // Añadimos los vecinos a la cola si no han sido visitados y son transitables
-                    for (Pair dir : Direcciones.direcciones.values()) {
-                        Pair vecino = new Pair(actual.x + dir.x, actual.y + dir.y);
-                        if (!visitados.contains(vecino) && this.tablero.isTransitable(vecino)) {
-                            visitados.add(vecino);
-                            cola.add(vecino);
-                        }
-                    }
-                }
-                nivel++;
-            }
-        }
-
-        return peligros;
-    }
-
-    /**
      * Predice el peligro de la casilla dos posiciones hacia delante, si no es
      * transitable se devuelve el maximo
      * 
@@ -182,12 +136,10 @@ public class AgenteCompeticion extends AbstractPlayer {
         Pair siguiente_posicion = new Pair(posActual.x + direccion.x, posActual.y + direccion.y);
         if (!this.tablero.isTransitable(posFutura)) {
             if(this.tablero.isTransitable(siguiente_posicion))
-                return calcularPeligroInmediato(siguiente_posicion); // Si la posición futura no es transitable, devolvemos el máximo
-            else
-                return 1000;
+                return calcularPeligroInmediato(siguiente_posicion); // Si la posición futura no es transitable, devolvemos la posicion intermedia (esta es transitable puesto que su accion se obtiene a partir de getAcciones)
         }
 
-        return (calcularPeligroInmediato(posFutura)+2*calcularPeligroInmediato(siguiente_posicion))/3;
+        return calcularPeligroInmediato(posFutura);
     }
 
     private void planificador(ElapsedCpuTimer elapsedTimer) {
@@ -232,7 +184,7 @@ public class AgenteCompeticion extends AbstractPlayer {
     @Override
     public ACTIONS act(StateObservation stateObs, ElapsedCpuTimer elapsedTimer) {
         this.tablero.update(stateObs); // Actualizamos el tablero
-        final int UMBRAL_PELIGRO = 500; // Valor umbral para el peligro
+        final int UMBRAL_PELIGRO = 10000; // Valor umbral para el peligro
         // Si el agente está en una posición peligrosa, reaccionamos
         if (this.calcularPeligroInmediato(this.actual.pos) > UMBRAL_PELIGRO) {
             ACTIONS a = reaccionarAEnemigos();

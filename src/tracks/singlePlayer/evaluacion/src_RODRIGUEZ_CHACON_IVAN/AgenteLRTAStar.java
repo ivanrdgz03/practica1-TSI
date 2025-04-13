@@ -36,11 +36,10 @@ public class AgenteLRTAStar extends AbstractPlayer {
             
             hijos.add(hijo);
         }
-        Nodo mejor = hijos.poll();
-
-        // Si no hay hijos, no podemos avanzar y nos quedamos quietos
-        if(hijos.isEmpty())
+        if(hijos.isEmpty())    // Si no hay hijos, no podemos avanzar y nos quedamos quietos
             return ACTIONS.ACTION_NIL;
+            
+        Nodo mejor = hijos.poll();
         
         //Actualizamos la heurística del nodo actual en base a la del mejor
         if((mejor.heuristica+1)>this.actual.heuristica){
@@ -51,10 +50,10 @@ public class AgenteLRTAStar extends AbstractPlayer {
         
         long tFin = System.nanoTime();
         this.iteraciones++;
-        this.tiempoTotalms += ((tFin - tInicio) / 1000000);
+        this.tiempoTotalms += (tFin - tInicio);
         if(this.tablero.esSalida(actual.pos)){
             System.out.println("Iteraciones: " + this.iteraciones);
-            System.out.println("Tiempo medio: " + this.tiempoTotalms/this.iteraciones + " ms");
+            System.out.println("Tiempo medio: " + this.tiempoTotalms / 1000000 + " ms");
         }
         return mejor.accion_padre;
     }

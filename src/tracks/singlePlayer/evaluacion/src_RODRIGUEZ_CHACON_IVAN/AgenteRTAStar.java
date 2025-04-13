@@ -54,11 +54,11 @@ public class AgenteRTAStar extends AbstractPlayer {
 
         long tFin = System.nanoTime();
         this.iteraciones++;
-        this.tiempoTotalms += ((tFin - tInicio) / 1000000);
+        this.tiempoTotalms += (tFin - tInicio);
 
         if(this.tablero.esSalida(actual.pos)){ // Si hemos llegado a la salida, reiniciamos el nodo actual
             System.out.println("Iteraciones: " + this.iteraciones);
-            System.out.println("Tiempo medio: " + this.tiempoTotalms/this.iteraciones + " ms");
+            System.out.println("Tiempo medio: " + this.tiempoTotalms / 1000000 + " ms");
         }
         return mejor.accion_padre;
     }
